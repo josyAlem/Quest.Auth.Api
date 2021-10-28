@@ -21,9 +21,9 @@ workflows:
   version: 2
   build-deploy:
         jobs:
-          - build
-               filters:
-                 branches:
+          - build:
+              filters:
+                branches:
                    only:
                      - master
-                     - release
+                     - /release*/
