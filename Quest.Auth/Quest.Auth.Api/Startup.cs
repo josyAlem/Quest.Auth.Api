@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -32,6 +33,20 @@ namespace Quest.Auth.Api
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Quest.Auth.Api", Version = "v1" });
             });
+
+            // 1. Add Authentication Services
+            var domain = Configuration["Auth0:Domain"];
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.Authority = domain;
+                options.Audience = Configuration["Auth0:Audience"];
+            });
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -54,6 +69,8 @@ namespace Quest.Auth.Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+            }
+
                 app.UseSwagger();
                 app.UseSwaggerUI(o =>
                 {
@@ -66,11 +83,14 @@ namespace Quest.Auth.Api
                     string swaggerEndpoint = $"/{virtualDirectory}swagger/{appVersion}/swagger.json";
                     o.SwaggerEndpoint(swaggerEndpoint, appName);
                 });
-            }
+            
 
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            // 2. Enable authentication middleware
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
