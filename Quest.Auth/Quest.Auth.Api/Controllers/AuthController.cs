@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -13,36 +14,32 @@ namespace Quest.Auth.Api.Controllers
     [Authorize]
     public class AuthController : ControllerBase
     {
-        // GET: api/<AuthController>
-        [HttpGet]
-        public IEnumerable<string> Get()
+
+        [HttpPost("[action]")]
+        [AllowAnonymous]
+        [Consumes("application/x-www-form-urlencoded")]
+        public IActionResult GetToken([FromForm] IFormCollection value)
         {
-            return new string[] { "value1", "value2" };
+            return Ok();//return token
         }
 
-        // GET api/<AuthController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpPost("[action]")]
+        [AllowAnonymous]
+        public IActionResult Login([FromBody] string value)
         {
-            return "value";
+            return Ok(); //return token
+        }
+        [HttpGet("[action]")]
+        [Authorize("get:products")]
+        public IActionResult Validate()
+        {
+            return Ok();//return user
+        }
+        [HttpGet("[action]")]
+        public IActionResult RefreshToken()
+        {
+            return Ok();
         }
 
-        // POST api/<AuthController>
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT api/<AuthController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/<AuthController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
     }
 }
