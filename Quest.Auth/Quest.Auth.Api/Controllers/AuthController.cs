@@ -25,12 +25,19 @@ namespace Quest.Auth.Api.Controllers
 
         [HttpPost("[action]")]
         [AllowAnonymous]
+        public IActionResult Signup([FromBody] string value)
+        {
+            return Ok();
+        }
+
+        [HttpPost("[action]")]
+        [AllowAnonymous]
         public IActionResult Login([FromBody] string value)
         {
             return Ok(); //return token
         }
         [HttpGet("[action]")]
-        [Authorize("get:products")]
+        [Authorize(AuthorizationScope.Products.Get)]
         public IActionResult Validate()
         {
             return Ok();//return user

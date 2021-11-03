@@ -46,10 +46,10 @@ namespace Quest.Auth.Api
             });
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("get:products", policy => policy.Requirements.Add(new HasScopeRequirement("get:products", domain)));
+                options.AddPolicy(AuthorizationScope.Products.Get, policy => policy.Requirements.Add(new AuthorizationScopeRequirement(AuthorizationScope.Products.Get, domain)));
             });
             // Register the scope authorization handler
-            services.AddSingleton<IAuthorizationHandler, HasScopeHandler>();
+            services.AddSingleton<IAuthorizationHandler, AuthorizationScopeHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
