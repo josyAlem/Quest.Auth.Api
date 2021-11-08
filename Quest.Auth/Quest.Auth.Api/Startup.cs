@@ -2,24 +2,64 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using Quest.Auth.Common.Settings;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 
 namespace Quest.Auth.Api
 {
     public class Startup
     {
+
+        private readonly string VirtualDirectory = "VirtualDirectory";
+        private readonly string appVersion;
+        private readonly string virtualDirectory;
+        private readonly string appName;
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            string SwaggerGenerationConfiguration = "SwaggerGenerationSettings";
+            string AppVersion = "AppVersion";
+            string AppName = "AppName";
+            IConfigurationSection swaggerGenerationConfig = configuration.GetSection(SwaggerGenerationConfiguration);
+            if (swaggerGenerationConfig == null)
+            {
+                throw new ArgumentNullException(nameof(SwaggerGenerationConfiguration), $"{SwaggerGenerationConfiguration} does not exist in appsettings.json");
+            }
+
+            appVersion = swaggerGenerationConfig[AppVersion];
+            virtualDirectory = swaggerGenerationConfig[VirtualDirectory];
+            appName = swaggerGenerationConfig[AppName];
+
+            //var auth0Setting = auth0Config.Get<Auth0Settings>();
+
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Information()
+              .Enrich.WithProperty("Application", appName)
+              .Enrich.FromLogContext()
+              .WriteTo.Console()
+              .WriteTo.File(path: "C:\\Logs\\Quest.Auth.Api\\Quest.Auth.Api-.log",
+              restrictedToMinimumLevel:Serilog.Events.LogEventLevel.Information,
+              outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{RequestId}] {Message}{NewLine}{Exception}",
+              null,fileSizeLimitBytes: 104857600,null,
+              false,false,null,rollingInterval:RollingInterval.Day,
+              rollOnFileSizeLimit:true,retainedFileCountLimit:60,null,null,null
+              )
+              .CreateLogger();
+             
+
         }
 
         public IConfiguration Configuration { get; }
@@ -27,21 +67,26 @@ namespace Quest.Auth.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            #region Setting Config
+            var auth0Config = Configuration.GetSection("Auth0");
+            services.Configure<Auth0Settings>(auth0Config);
+            var auth0Setting = auth0Config.Get<Auth0Settings>();
+            #endregion
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Quest.Auth.Api", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = appName, Version = appVersion });
             });
 
-            // 1. Add Authentication Services
-            var domain = Configuration["Auth0:Domain"];
+            #region Authentication and Authorization
+            var domain = auth0Setting.Auth0.Domain;
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
             {
                 options.Authority = domain;
-                options.Audience = Configuration["Auth0:Audience"];
-               
+                options.Audience = auth0Setting.Auth0.QuestAuth.Audience;
+
             });
             services.AddAuthorization(options =>
             {
@@ -49,49 +94,35 @@ namespace Quest.Auth.Api
             });
             // Register the scope authorization handler
             services.AddSingleton<IAuthorizationHandler, AuthorizationScopeHandler>();
+            #endregion
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env,IConfiguration config)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-             string SwaggerGenerationConfiguration = "SwaggerGenerationSettings";
-            string AppVersion = "AppVersion";
-       string AppName = "AppName";
-       string VirtualDirectory = "VirtualDirectory"; 
-        IConfigurationSection swaggerGenerationConfig = config.GetSection(SwaggerGenerationConfiguration);
-            if (swaggerGenerationConfig == null)
-            {
-                throw new ArgumentNullException(nameof(SwaggerGenerationConfiguration), $"{SwaggerGenerationConfiguration} does not exist in appsettings.json");
-            }
-
-            string appVersion = swaggerGenerationConfig[AppVersion];
-            string virtualDirectory = swaggerGenerationConfig[VirtualDirectory];
-            string appName = swaggerGenerationConfig[AppName];
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-
-                app.UseSwagger();
-                app.UseSwaggerUI(o =>
-                {
-
-                    o.RoutePrefix = "api-docs";
-
-                    //Allow to show addition attribute info on doc. Example: [MaxLength(50)]
-                    o.ShowCommonExtensions();
-
-                    string swaggerEndpoint = $"/{virtualDirectory}swagger/{appVersion}/swagger.json";
-                    o.SwaggerEndpoint(swaggerEndpoint, appName);
-                });
             
+            app.UseSwagger();
+            app.UseSwaggerUI(o =>
+            {
 
+                o.RoutePrefix = "api-docs";
+
+                //Allow to show addition attribute info on doc. Example: [MaxLength(50)]
+                o.ShowCommonExtensions();
+
+                string swaggerEndpoint = $"/{virtualDirectory}swagger/{appVersion}/swagger.json";
+                o.SwaggerEndpoint(swaggerEndpoint, appName);
+            });
+            
             app.UseHttpsRedirection();
 
             app.UseRouting();
 
-            // 2. Enable authentication middleware
             app.UseAuthentication();
 
             app.UseAuthorization();
