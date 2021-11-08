@@ -18,7 +18,7 @@ namespace Quest.Auth.Api.Controllers
         [HttpPost("[action]")]
         [AllowAnonymous]
         [Consumes("application/x-www-form-urlencoded")]
-        public IActionResult GetToken([FromForm] IFormCollection value)
+        public IActionResult Token([FromForm] IFormCollection value)
         {
             return Ok();//return token
         }
