@@ -11,7 +11,7 @@ namespace Quest.Auth.Api
             // If user does not have the permissions claim, get out of here
             if (!context.User.HasClaim(c => c.Type == "permissions" && c.Issuer == requirement.Issuer))
                 return Task.CompletedTask;
-
+           
             // Split the permissions string into an array
             var permissions = context.User.FindFirst(c => c.Type == "permissions" && c.Issuer == requirement.Issuer).Value.Split(' ');
 
