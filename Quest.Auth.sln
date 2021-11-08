@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31605.320
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quest.Auth.Api", "Quest.Auth\Quest.Auth.Api\Quest.Auth.Api.csproj", "{7E3D836C-F312-4C2F-B578-F6A2D8845CFA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Quest.Auth.Api", "Quest.Auth\Quest.Auth.Api\Quest.Auth.Api.csproj", "{7E3D836C-F312-4C2F-B578-F6A2D8845CFA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quest.Auth.Services", "Quest.Auth\Quest.Auth.Services\Quest.Auth.Services.csproj", "{AF0C7969-2C79-44C1-90C9-E7793797B8A5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quest.Auth.Common", "Quest.Auth\Quest.Auth.Common\Quest.Auth.Common.csproj", "{838D998F-ED46-45EF-9EAC-F37EC7CF45A5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{7E3D836C-F312-4C2F-B578-F6A2D8845CFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E3D836C-F312-4C2F-B578-F6A2D8845CFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7E3D836C-F312-4C2F-B578-F6A2D8845CFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF0C7969-2C79-44C1-90C9-E7793797B8A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF0C7969-2C79-44C1-90C9-E7793797B8A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF0C7969-2C79-44C1-90C9-E7793797B8A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF0C7969-2C79-44C1-90C9-E7793797B8A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{838D998F-ED46-45EF-9EAC-F37EC7CF45A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{838D998F-ED46-45EF-9EAC-F37EC7CF45A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{838D998F-ED46-45EF-9EAC-F37EC7CF45A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{838D998F-ED46-45EF-9EAC-F37EC7CF45A5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -20,4 +20,9 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Quest.Auth.Common\Quest.Auth.Common.csproj" />
+    <ProjectReference Include="..\Quest.Auth.Services\Quest.Auth.Services.csproj" />
+  </ItemGroup>
+
 </Project>

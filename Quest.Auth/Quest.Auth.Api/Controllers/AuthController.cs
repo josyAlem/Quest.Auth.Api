@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Quest.Auth.Common.Request;
+using Quest.Auth.Common.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,38 +17,32 @@ namespace Quest.Auth.Api.Controllers
     public class AuthController : ControllerBase
     {
 
+       
         [HttpPost("[action]")]
         [AllowAnonymous]
-        [Consumes("application/x-www-form-urlencoded")]
-        public IActionResult Token([FromForm] IFormCollection value)
+        public async Task<ActionResult<SignupResponse>> Signup([FromBody]  SignupRequest signupRequest)
         {
-            return Ok();//return token
+            return Ok(new SignupResponse());
         }
 
         [HttpPost("[action]")]
         [AllowAnonymous]
-        public IActionResult Signup([FromBody] string value)
+        public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest loginRequest)
         {
-            return Ok();
+            return Ok(new LoginResponse()); 
+        }
+       
+        [HttpGet("[action]")]
+        public async Task<ActionResult<LoginResponse>> Refresh([FromBody] RefreshTokenRequest refreshTokenRequest)
+        {
+            return Ok(new LoginResponse());
         }
 
-        [HttpPost("[action]")]
-        [AllowAnonymous]
-        public IActionResult Login([FromBody] string value)
-        {
-            return Ok(); //return token
-        }
         [HttpGet("[action]")]
         [Authorize(AuthorizationScope.Products.Get)]
         public IActionResult Validate()
         {
             return Ok();//return user
         }
-        [HttpGet("[action]")]
-        public IActionResult RefreshToken()
-        {
-            return Ok();
-        }
-
     }
 }
