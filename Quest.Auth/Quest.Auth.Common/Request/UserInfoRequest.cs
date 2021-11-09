@@ -9,10 +9,4 @@ namespace Quest.Auth.Common.Request
     {
     public string AccessToken { get; set; }
     }
-
-    public class Auth0UserInfoRequest
-    {
-        public string AccessToken { get; set; }
-
-    }
 }

@@ -99,6 +99,7 @@ namespace Quest.Auth.Api
             services.AddSingleton<IAuthorizationHandler, AuthorizationScopeHandler>();
             #endregion
 
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddScoped<IAuth0Service, Auth0Service>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
 

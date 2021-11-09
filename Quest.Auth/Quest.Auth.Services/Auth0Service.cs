@@ -39,8 +39,8 @@ namespace Quest.Auth.Services
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                Log.Error("Login:Access Token cannot be obtained");
-                throw new KeyNotFoundException();
+                Log.Error("Login:Access Token cannot be obtained! "+ response.ErrorMessage);
+                throw new Exception();
             }
 
             var loginResponse = JsonConvert.DeserializeObject<Auth0LoginResponse>(response.Content);

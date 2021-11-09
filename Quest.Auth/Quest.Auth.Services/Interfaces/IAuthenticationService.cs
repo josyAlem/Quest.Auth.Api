@@ -12,6 +12,6 @@ namespace Quest.Auth.Services.Interfaces
     {
         Task<SignupResponse> SignUp(SignupRequest signupRequest);
         Task<LoginResponse> Login(LoginRequest loginRequest);
-        Task<LoginResponse> Refresh(RefreshTokenRequest refreshTokenRequest);
+        Task<RefreshTokenResponse> Refresh(RefreshTokenRequest refreshTokenRequest);
     }
 }
