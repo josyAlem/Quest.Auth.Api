@@ -12,6 +12,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Quest.Auth.Common.Settings;
+using Quest.Auth.Services;
+using Quest.Auth.Services.Interfaces;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -68,9 +70,10 @@ namespace Quest.Auth.Api
         public void ConfigureServices(IServiceCollection services)
         {
             #region Setting Config
+            var auth0Setting = new Auth0Settings();
             var auth0Config = Configuration.GetSection("Auth0");
+            auth0Config.Bind(auth0Setting);
             services.Configure<Auth0Settings>(auth0Config);
-            var auth0Setting = auth0Config.Get<Auth0Settings>();
             #endregion
 
             services.AddControllers();
@@ -80,12 +83,12 @@ namespace Quest.Auth.Api
             });
 
             #region Authentication and Authorization
-            var domain = auth0Setting.Auth0.Domain;
+            var domain = auth0Setting.Domain;
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
             {
                 options.Authority = domain;
-                options.Audience = auth0Setting.Auth0.QuestAuth.Audience;
+                options.Audience = auth0Setting.QuestAuth.Audience;
 
             });
             services.AddAuthorization(options =>
@@ -95,6 +98,9 @@ namespace Quest.Auth.Api
             // Register the scope authorization handler
             services.AddSingleton<IAuthorizationHandler, AuthorizationScopeHandler>();
             #endregion
+
+            services.AddScoped<IAuth0Service, Auth0Service>();
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
 
         }
 

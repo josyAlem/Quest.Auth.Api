@@ -10,8 +10,8 @@ namespace Quest.Auth.Services.Interfaces
 {
  public interface IAuthenticationService
     {
-        public SignupResponse SignUp(SignupRequest signupRequest);
-        public LoginResponse Login(LoginRequest loginRequest);
-        public LoginResponse Refresh(RefreshTokenRequest refreshTokenRequest);
+        Task<SignupResponse> SignUp(SignupRequest signupRequest);
+        Task<LoginResponse> Login(LoginRequest loginRequest);
+        Task<LoginResponse> Refresh(RefreshTokenRequest refreshTokenRequest);
     }
 }

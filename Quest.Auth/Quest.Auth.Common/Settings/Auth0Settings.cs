@@ -76,29 +76,31 @@ namespace Quest.Auth.Common.Settings
 
     public class QuestAuth
     {
-        [JsonPropertyName("Client_Id")]
+        [JsonPropertyName("ClientId")]
         public string ClientId { get; set; }
 
-        [JsonPropertyName("Client_Secret")]
+        [JsonPropertyName("ClientSecret")]
         public string ClientSecret { get; set; }
 
         [JsonPropertyName("Audience")]
         public string Audience { get; set; }
 
-        [JsonPropertyName("Connection_realm")]
+        [JsonPropertyName("Connectionrealm")]
         public string ConnectionRealm { get; set; }
+        [JsonPropertyName("Scope")]
+        public string Scope { get; set; }
     }
 
     public class ClientSPA
     {
-        [JsonPropertyName("Client_Id")]
+        [JsonPropertyName("ClientId")]
         public string ClientId { get; set; }
 
-        [JsonPropertyName("Client_Secret")]
+        [JsonPropertyName("ClientSecret")]
         public string ClientSecret { get; set; }
     }
 
-    public class Auth0
+    public class Auth0Settings
     {
         [JsonPropertyName("Domain")]
         public string Domain { get; set; }
@@ -106,7 +108,7 @@ namespace Quest.Auth.Common.Settings
         [JsonPropertyName("Paths")]
         public Paths Paths { get; set; }
 
-        [JsonPropertyName("Grant_Types")]
+        [JsonPropertyName("GrantTypes")]
         public GrantTypes GrantTypes { get; set; }
 
         [JsonPropertyName("ManagementAPI")]
@@ -115,15 +117,11 @@ namespace Quest.Auth.Common.Settings
         [JsonPropertyName("Quest.Auth")]
         public QuestAuth QuestAuth { get; set; }
 
-        [JsonPropertyName("Client_SPA")]
+        [JsonPropertyName("ClientSPA")]
         public ClientSPA ClientSPA { get; set; }
     }
 
-    public class Auth0Settings
-    {
-        [JsonPropertyName("Auth0")]
-        public Auth0 Auth0 { get; set; }
-    }
+    
 
 
 }

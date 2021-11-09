@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Quest.Auth.Common.Request;
 using Quest.Auth.Common.Response;
+using Quest.Auth.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,26 +17,34 @@ namespace Quest.Auth.Api.Controllers
     [Authorize]
     public class AuthController : ControllerBase
     {
+        private readonly IAuthenticationService _authenticationService;
 
+        public AuthController(IAuthenticationService authenticationService)
+        {
+            _authenticationService = authenticationService;
+        }
        
         [HttpPost("[action]")]
         [AllowAnonymous]
         public async Task<ActionResult<SignupResponse>> Signup([FromBody]  SignupRequest signupRequest)
         {
-            return Ok(new SignupResponse());
+            var response = await _authenticationService.SignUp(signupRequest);
+            return Ok(response);
         }
 
         [HttpPost("[action]")]
         [AllowAnonymous]
         public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest loginRequest)
         {
-            return Ok(new LoginResponse()); 
+           var response=await _authenticationService.Login(loginRequest);
+            return Ok(response); 
         }
        
         [HttpGet("[action]")]
         public async Task<ActionResult<LoginResponse>> Refresh([FromBody] RefreshTokenRequest refreshTokenRequest)
         {
-            return Ok(new LoginResponse());
+            var response = await _authenticationService.Refresh(refreshTokenRequest);
+            return Ok(response);
         }
 
         [HttpGet("[action]")]
