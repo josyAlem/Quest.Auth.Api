@@ -2,23 +2,15 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Quest.Auth.Common.Settings;
 using Quest.Auth.Services;
 using Quest.Auth.Services.Interfaces;
 using Serilog;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 
 namespace Quest.Auth.Api
 {

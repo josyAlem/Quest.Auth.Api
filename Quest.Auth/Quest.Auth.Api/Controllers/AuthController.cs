@@ -1,12 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Quest.Auth.Common.Request;
 using Quest.Auth.Common.Response;
 using Quest.Auth.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 
@@ -40,8 +36,9 @@ namespace Quest.Auth.Api.Controllers
             return Ok(response); 
         }
        
-        [HttpGet("[action]")]
-        public async Task<ActionResult<LoginResponse>> Refresh([FromBody] RefreshTokenRequest refreshTokenRequest)
+        [HttpPost("[action]")]
+        [AllowAnonymous]
+        public async Task<ActionResult<RefreshTokenResponse>> Refresh([FromBody] RefreshTokenRequest refreshTokenRequest)
         {
             var response = await _authenticationService.Refresh(refreshTokenRequest);
             return Ok(response);

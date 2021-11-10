@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Quest.Auth.Common.Response
+﻿namespace Quest.Auth.Common.Response
 {
     public class RefreshTokenResponse
     {

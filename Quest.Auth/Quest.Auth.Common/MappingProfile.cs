@@ -1,15 +1,10 @@
 ﻿using AutoMapper;
 using Quest.Auth.Common.Request;
 using Quest.Auth.Common.Response;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Quest.Auth.Common
 {
-   public class MappingProfile:Profile
+    public class MappingProfile:Profile
     {
         public MappingProfile()
         {

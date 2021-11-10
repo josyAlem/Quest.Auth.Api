@@ -4,9 +4,7 @@ using Quest.Auth.Common.Request;
 using Quest.Auth.Common.Response;
 using Quest.Auth.Common.Settings;
 using Quest.Auth.Services.Interfaces;
-using System;
 using System.Threading.Tasks;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace Quest.Auth.Services
 {
@@ -42,12 +40,24 @@ namespace Quest.Auth.Services
 
         public async Task<RefreshTokenResponse> Refresh(RefreshTokenRequest refreshTokenRequest)
         {
-            throw new NotImplementedException();
+            Auth0RefreshTokenRequest auth0refreshTokenRequest = _mapper.Map<Auth0RefreshTokenRequest>(refreshTokenRequest);
+            auth0refreshTokenRequest.GrantType = _auth0Settings.GrantTypes.Refresh;
+            var authresponse = await _auth0Service.Refresh(auth0refreshTokenRequest);
+
+            RefreshTokenResponse refreshResponse = _mapper.Map<RefreshTokenResponse>(authresponse);
+
+            return refreshResponse;
         }
 
         public async Task<SignupResponse> SignUp(SignupRequest signupRequest)
         {
-            throw new NotImplementedException();
+            Auth0SignupRequest auth0signupRequest = _mapper.Map<Auth0SignupRequest>(signupRequest);
+            auth0signupRequest.Connection = _auth0Settings.QuestAuth.ConnectionRealm;
+            var authresponse = await _auth0Service.SignUp(auth0signupRequest);
+
+            SignupResponse loginResponse = _mapper.Map<SignupResponse>(authresponse);
+
+            return loginResponse;
         }
     }
 }

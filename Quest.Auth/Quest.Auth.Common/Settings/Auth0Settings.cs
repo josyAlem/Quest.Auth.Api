@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
 
 namespace Quest.Auth.Common.Settings
 {
- 
+
     public class Paths
     {
         [JsonPropertyName("Token")]
@@ -27,6 +22,8 @@ namespace Quest.Auth.Common.Settings
     {
         [JsonPropertyName("Client")]
         public string Client { get; set; }
+        [JsonPropertyName("Refresh")]
+        public string Refresh { get; set; }
 
         [JsonPropertyName("Password")]
         public string Password { get; set; }

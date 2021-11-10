@@ -8,10 +8,7 @@ using RestSharp;
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Quest.Auth.Services
@@ -39,15 +36,16 @@ namespace Quest.Auth.Services
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                Log.Error("Login:Access Token cannot be obtained! "+ response.ErrorMessage);
-                throw new Exception();
+                Log.Error("Login:Access Token cannot be obtained! "+ response.Content);
+                throw new Exception(response.Content);
+
             }
 
             var loginResponse = JsonConvert.DeserializeObject<Auth0LoginResponse>(response.Content);
             return loginResponse;
         }
 
-        public async Task<Auth0LoginResponse> Refresh(Auth0RefreshTokenRequest refreshTokenRequest)
+        public async Task<Auth0RefreshTokenResponse> Refresh(Auth0RefreshTokenRequest refreshTokenRequest)
         {
             var req = new RestRequest(_auth0Settings.Paths.Token, Method.POST);
             req.AddParameter("client_id", refreshTokenRequest.ClientId, ParameterType.GetOrPost);
@@ -58,31 +56,45 @@ namespace Quest.Auth.Services
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 Log.Error("Refresh:Access Token cannot be obtained");
-                throw new KeyNotFoundException();
+                throw new Exception(response.Content);
+
             }
 
-            var loginResponse = JsonConvert.DeserializeObject<Auth0LoginResponse>(response.Content);
-            return loginResponse;
+            var refreshResponse = JsonConvert.DeserializeObject<Auth0RefreshTokenResponse>(response.Content);
+            return refreshResponse;
         }
 
-        public async Task<SignupResponse> SignUp(Auth0SignupRequest signupRequest)
+        public async Task<Auth0SignupResponse> SignUp(Auth0SignupRequest signupRequest)
         {
             var getTokenResponse = await GetManagementAPIToken(_auth0Settings.Domain + _auth0Settings.ManagementAPI.Token.Path,
                 _auth0Settings.QuestAuth.ClientId, _auth0Settings.QuestAuth.ClientSecret, _auth0Settings.GrantTypes.Client);
 
             var req = new RestRequest(_auth0Settings.ManagementAPI.Token.Path+_auth0Settings.ManagementAPI.Signup.Path, Method.POST);
             req.AddHeader("authorization", "Bearer "+ getTokenResponse.AccessToken);
-            req.AddParameter("email", signupRequest.Email, ParameterType.GetOrPost);
-            req.AddParameter("password", signupRequest.Password, ParameterType.GetOrPost);
-            req.AddParameter("connection", signupRequest.Connection, ParameterType.GetOrPost);
+            req.AddHeader("content-type", "application/json");
+            req.RequestFormat = DataFormat.Json;
+            req.AddJsonBody(new
+            {
+                email = signupRequest.Email,
+                password = signupRequest.Password,
+                connection = signupRequest.Connection
+            });
             IRestResponse response = await _client.ExecuteAsync(req);
 
-            if (response.StatusCode != HttpStatusCode.OK)
+            if (response.StatusCode != HttpStatusCode.Created)
             {
-                Log.Error("Access Token cannot be obtained, process terminate");
-                throw new KeyNotFoundException();
+                if (response.StatusCode == HttpStatusCode.Conflict)
+                {
+                    Log.Error("User already exists");
+                    throw new Exception("User already exists");
+                }
+                else
+                {
+                    Log.Error("Access Token cannot be obtained, process terminate");
+                    throw new Exception(response.Content);
+                }
             }
-            var signupResponse = JsonConvert.DeserializeObject<SignupResponse>(response.Content);
+            var signupResponse = JsonConvert.DeserializeObject<Auth0SignupResponse>(response.Content);
             return signupResponse;
         }
 
@@ -98,7 +110,8 @@ namespace Quest.Auth.Services
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 Log.Error("Access Token cannot be obtained, process terminate");
-                throw new KeyNotFoundException();
+                throw new Exception(response.Content);
+
             }
             var roleResponse = JsonConvert.DeserializeObject<List<Auth0RoleResponse>>(response.Content);
             return roleResponse;
@@ -116,7 +129,7 @@ namespace Quest.Auth.Services
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 Log.Error("Access Token cannot be obtained");
-                throw new KeyNotFoundException();
+                throw new Exception(response.Content);
             }
 
             var tokenResponse = JsonConvert.DeserializeObject<Auth0TokenResponse>(response.Content);
