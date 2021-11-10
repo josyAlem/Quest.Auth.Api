@@ -32,31 +32,22 @@ namespace Quest.Auth.Common.Settings
         public string PasswordRealm { get; set; }
     }
 
-    public class Token
+    public class Token : PathType
     {
-        [JsonPropertyName("Method")]
-        public string Method { get; set; }
-
-        [JsonPropertyName("Path")]
-        public string Path { get; set; }
+     
     }
 
-    public class Signup
+    public class Users : PathType
     {
-        [JsonPropertyName("Method")]
-        public string Method { get; set; }
-
-        [JsonPropertyName("Path")]
-        public string Path { get; set; }
+       
     }
 
-    public class Roles
+    public class Roles: PathType
     {
-        [JsonPropertyName("Method")]
-        public string Method { get; set; }
-
-        [JsonPropertyName("Path")]
-        public string Path { get; set; }
+    }
+    public class Permissions: PathType
+    {
+       
     }
 
     public class ManagementAPI
@@ -65,10 +56,12 @@ namespace Quest.Auth.Common.Settings
         public Token Token { get; set; }
 
         [JsonPropertyName("Signup")]
-        public Signup Signup { get; set; }
+        public Users Users { get; set; }
 
         [JsonPropertyName("Roles")]
         public Roles Roles { get; set; }
+        [JsonPropertyName("Permissions")]
+        public Permissions Permissions { get; set; }
     }
 
     public class QuestAuth
@@ -118,7 +111,13 @@ namespace Quest.Auth.Common.Settings
         public ClientSPA ClientSPA { get; set; }
     }
 
-    
+    public class PathType {
+        [JsonPropertyName("Method")]
+        public string Method { get; set; }
+
+        [JsonPropertyName("Path")]
+        public string Path { get; set; }
+    }
 
 
 }

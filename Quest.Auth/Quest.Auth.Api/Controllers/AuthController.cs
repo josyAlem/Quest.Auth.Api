@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Quest.Auth.Common;
 using Quest.Auth.Common.Request;
 using Quest.Auth.Common.Response;
 using Quest.Auth.Services.Interfaces;
@@ -33,6 +34,7 @@ namespace Quest.Auth.Api.Controllers
         public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest loginRequest)
         {
            var response=await _authenticationService.Login(loginRequest);
+            var x = User;
             return Ok(response); 
         }
        

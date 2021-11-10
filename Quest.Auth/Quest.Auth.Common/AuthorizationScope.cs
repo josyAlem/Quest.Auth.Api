@@ -1,4 +1,4 @@
-﻿namespace Quest.Auth.Api
+﻿namespace Quest.Auth.Common
 {
     public static class AuthorizationScope
     {

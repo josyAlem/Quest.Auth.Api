@@ -1,4 +1,6 @@
-﻿namespace Quest.Auth.Common.Response
+﻿using System.Collections.Generic;
+
+namespace Quest.Auth.Common.Response
 {
     public class LoginResponse
     {
@@ -6,5 +8,6 @@
         public string RefreshToken { get; set; }
         public bool IsAdmin { get; set; }
         public int ExpiresIn { get; set; }
+        public List<string> Permissions { get; set; }
     }
 }

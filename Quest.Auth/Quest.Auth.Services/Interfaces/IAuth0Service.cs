@@ -9,5 +9,6 @@ namespace Quest.Auth.Services.Interfaces
         Task<Auth0LoginResponse> Login(Auth0LoginRequest loginRequest);
         Task<Auth0SignupResponse> SignUp(Auth0SignupRequest signupRequest);
         Task<Auth0RefreshTokenResponse> Refresh(Auth0RefreshTokenRequest refreshTokenRequest);
+        Task<Auth0UserInfoResponse> GetUserInfo(Auth0UserInfoRequest auth0UserInfoRequest);
     }
 }

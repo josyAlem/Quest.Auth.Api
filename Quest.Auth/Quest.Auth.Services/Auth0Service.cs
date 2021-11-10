@@ -8,12 +8,13 @@ using RestSharp;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
 namespace Quest.Auth.Services
 {
-    public class Auth0Service:IAuth0Service
+    public class Auth0Service : IAuth0Service
     {
         private RestClient _client;
         private readonly Auth0Settings _auth0Settings;
@@ -36,7 +37,7 @@ namespace Quest.Auth.Services
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                Log.Error("Login:Access Token cannot be obtained! "+ response.Content);
+                Log.Error("Login:Access Token cannot be obtained! " + response.Content);
                 throw new Exception(response.Content);
 
             }
@@ -69,8 +70,9 @@ namespace Quest.Auth.Services
             var getTokenResponse = await GetManagementAPIToken(_auth0Settings.Domain + _auth0Settings.ManagementAPI.Token.Path,
                 _auth0Settings.QuestAuth.ClientId, _auth0Settings.QuestAuth.ClientSecret, _auth0Settings.GrantTypes.Client);
 
-            var req = new RestRequest(_auth0Settings.ManagementAPI.Token.Path+_auth0Settings.ManagementAPI.Signup.Path, Method.POST);
-            req.AddHeader("authorization", "Bearer "+ getTokenResponse.AccessToken);
+            var req = new RestRequest(_auth0Settings.ManagementAPI.Token.Path 
+                + _auth0Settings.ManagementAPI.Users.Path, Method.POST);
+            req.AddHeader("authorization", "Bearer " + getTokenResponse.AccessToken);
             req.AddHeader("content-type", "application/json");
             req.RequestFormat = DataFormat.Json;
             req.AddJsonBody(new
@@ -98,13 +100,14 @@ namespace Quest.Auth.Services
             return signupResponse;
         }
 
-        public async Task<List<Auth0RoleResponse>> GetRoles(Auth0SignupRequest signupRequest)
+        private async Task<List<Auth0RoleResponse>> GetUserRoles(string userId)
         {
             var getTokenResponse = await GetManagementAPIToken(_auth0Settings.Domain + _auth0Settings.ManagementAPI.Token.Path,
                 _auth0Settings.QuestAuth.ClientId, _auth0Settings.QuestAuth.ClientSecret, _auth0Settings.GrantTypes.Client);
 
-            var req = new RestRequest(_auth0Settings.ManagementAPI.Token.Path+_auth0Settings.ManagementAPI.Roles.Path, Method.GET);
-            req.AddHeader("authorization", "Bearer "+ getTokenResponse.AccessToken);
+            var req = new RestRequest(_auth0Settings.ManagementAPI.Token.Path 
+                + _auth0Settings.ManagementAPI.Users.Path + "/" + userId + "/" + _auth0Settings.ManagementAPI.Roles.Path, Method.GET);
+            req.AddHeader("authorization", "Bearer " + getTokenResponse.AccessToken);
             IRestResponse response = await _client.ExecuteAsync(req);
 
             if (response.StatusCode != HttpStatusCode.OK)
@@ -117,14 +120,57 @@ namespace Quest.Auth.Services
             return roleResponse;
         }
 
-        private async Task<Auth0TokenResponse> GetManagementAPIToken( string audience,string clientId,string clientSecret,string grantType) {
+
+        private async Task<List<Auth0PermissionResponse>> GetUserPermissions(string userId)
+        {
+            var getTokenResponse = await GetManagementAPIToken(_auth0Settings.Domain + _auth0Settings.ManagementAPI.Token.Path,
+              _auth0Settings.QuestAuth.ClientId, _auth0Settings.QuestAuth.ClientSecret, _auth0Settings.GrantTypes.Client);
+
+            var req = new RestRequest(_auth0Settings.ManagementAPI.Token.Path 
+                + _auth0Settings.ManagementAPI.Users.Path + "/" + userId + "/" 
+                + _auth0Settings.ManagementAPI.Permissions.Path, Method.GET);
+
+            req.AddHeader("authorization", "Bearer " + getTokenResponse.AccessToken);
+            IRestResponse response = await _client.ExecuteAsync(req);
+
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                Log.Error("Access Token cannot be obtained, process terminate");
+                throw new Exception(response.Content);
+
+            }
+            var permissionsResponse = JsonConvert.DeserializeObject<List<Auth0PermissionResponse>>(response.Content);
+            return permissionsResponse;
+        }
+        public async Task<Auth0UserInfoResponse> GetUserInfo(Auth0UserInfoRequest auth0UserInfoRequest)
+        {
+
+            var req = new RestRequest(_auth0Settings.Paths.Token+_auth0Settings.Paths.UserInfo, Method.POST);
+            req.AddHeader("authorization", "Bearer " + auth0UserInfoRequest.AccessToken);
+            IRestResponse response = await _client.ExecuteAsync(req);
+
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                Log.Error("User info cannot be obtained");
+                throw new Exception(response.Content);
+            }
+
+            var tokenResponse = JsonConvert.DeserializeObject<Auth0UserInfoResponse>(response.Content);
+            var auth0UserPermissionResponse = await GetUserPermissions(tokenResponse.UserId);
+            var auth0UserRoleResponse = await GetUserRoles(tokenResponse.UserId);
+            tokenResponse.Permissions =new List<string>();//TODO
+            tokenResponse.Roles = auth0UserRoleResponse.Select(c=>c.Name).ToList();
+            return tokenResponse;
+        }
+        private async Task<Auth0TokenResponse> GetManagementAPIToken(string audience, string clientId, string clientSecret, string grantType)
+        {
 
             var req = new RestRequest(_auth0Settings.Paths.Token, Method.POST);
             req.AddParameter("client_id", clientId, ParameterType.GetOrPost);
             req.AddParameter("grant_type", grantType, ParameterType.GetOrPost);
             req.AddParameter("client_secret", clientSecret, ParameterType.GetOrPost);
             req.AddParameter("audience", audience, ParameterType.GetOrPost);
-            IRestResponse response =await _client.ExecuteAsync(req);
+            IRestResponse response = await _client.ExecuteAsync(req);
 
             if (response.StatusCode != HttpStatusCode.OK)
             {

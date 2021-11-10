@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 
 namespace Quest.Auth.Common.Response
 {
@@ -13,6 +14,7 @@ namespace Quest.Auth.Common.Response
         public string Email { get; set; }
         [JsonProperty("updated_at")]
         public DateTime UpdatedOn { get; set; }
-        public string[] Roles { get; set; }
+        public List<string> Permissions { get; set; }
+        public List<string> Roles { get; set; }
     }
 }

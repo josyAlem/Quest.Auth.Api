@@ -4,6 +4,7 @@ using Quest.Auth.Common.Request;
 using Quest.Auth.Common.Response;
 using Quest.Auth.Common.Settings;
 using Quest.Auth.Services.Interfaces;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Quest.Auth.Services
@@ -30,9 +31,12 @@ namespace Quest.Auth.Services
             auth0loginRequest.Scope = _auth0Settings.QuestAuth.Scope;
             var authresponse =await _auth0Service.Login(auth0loginRequest);
 
+            var auth0UserinfoResponse =await _auth0Service.GetUserInfo(new Auth0UserInfoRequest { AccessToken= authresponse .AccessToken});
+            UserInfoResponse userinfoResponse = _mapper.Map<UserInfoResponse>(auth0UserinfoResponse);
             LoginResponse loginResponse = _mapper.Map<LoginResponse>(authresponse);
-            loginResponse.IsAdmin = false;//TODO; get from Roles
-           
+
+            loginResponse.IsAdmin =userinfoResponse.Roles.Contains("admin")?true: false;//TODO; get from Roles
+            loginResponse.Permissions = userinfoResponse.Permissions;
 
             return loginResponse;
 
