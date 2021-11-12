@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Quest.Auth.Common.Response
 {
@@ -17,5 +18,9 @@ namespace Quest.Auth.Common.Response
         public string TokenType { get; set; }
         [JsonProperty("scope")]
         public string Scope { get; set; }
+
+        public bool IsAdmin { get; set; }
+        public List<string> Permissions { get; set; }
+        public List<string> Roles { get; set; }
     }
 }

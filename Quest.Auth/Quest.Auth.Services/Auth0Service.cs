@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using AutoMapper;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Quest.Auth.Common.Request;
 using Quest.Auth.Common.Response;
@@ -18,10 +19,13 @@ namespace Quest.Auth.Services
     {
         private RestClient _client;
         private readonly Auth0Settings _auth0Settings;
-        public Auth0Service(IOptions<Auth0Settings> auth0Config)
+        private readonly IMapper _mapper;
+        private const string AdminRole = "ADMIN";
+        public Auth0Service(IOptions<Auth0Settings> auth0Config,IMapper mapper)
         {
             _auth0Settings = auth0Config.Value;
             _client = new RestClient(_auth0Settings.Domain);
+            _mapper = mapper;
         }
         public async Task<Auth0LoginResponse> Login(Auth0LoginRequest loginRequest)
         {
@@ -43,6 +47,14 @@ namespace Quest.Auth.Services
             }
 
             var loginResponse = JsonConvert.DeserializeObject<Auth0LoginResponse>(response.Content);
+
+            var auth0UserinfoResponse = await GetUserInfo(new Auth0UserInfoRequest { AccessToken = loginResponse.AccessToken, Audience = _auth0Settings.QuestAuth.Audience });
+            UserInfoResponse userinfoResponse = _mapper.Map<UserInfoResponse>(auth0UserinfoResponse);
+
+            loginResponse.IsAdmin = userinfoResponse.Roles.Any(c=>c.ToLower() == AdminRole.ToLower()) ? true : false;
+            loginResponse.Permissions = userinfoResponse.Permissions;
+            loginResponse.Roles = userinfoResponse.Roles;
+
             return loginResponse;
         }
 
@@ -145,7 +157,7 @@ namespace Quest.Auth.Services
         public async Task<Auth0UserInfoResponse> GetUserInfo(Auth0UserInfoRequest auth0UserInfoRequest)
         {
 
-            var req = new RestRequest(_auth0Settings.Paths.Token+_auth0Settings.Paths.UserInfo, Method.POST);
+            var req = new RestRequest(_auth0Settings.Paths.UserInfo, Method.POST);
             req.AddHeader("authorization", "Bearer " + auth0UserInfoRequest.AccessToken);
             IRestResponse response = await _client.ExecuteAsync(req);
 
@@ -158,7 +170,7 @@ namespace Quest.Auth.Services
             var tokenResponse = JsonConvert.DeserializeObject<Auth0UserInfoResponse>(response.Content);
             var auth0UserPermissionResponse = await GetUserPermissions(tokenResponse.UserId);
             var auth0UserRoleResponse = await GetUserRoles(tokenResponse.UserId);
-            tokenResponse.Permissions =new List<string>();//TODO
+            tokenResponse.Permissions = auth0UserPermissionResponse.Where(c=>c.SourceApp==auth0UserInfoRequest.Audience).Select(c=>c.Name).ToList();
             tokenResponse.Roles = auth0UserRoleResponse.Select(c=>c.Name).ToList();
             return tokenResponse;
         }
