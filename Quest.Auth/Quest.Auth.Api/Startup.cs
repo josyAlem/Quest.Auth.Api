@@ -1,12 +1,10 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using Quest.Auth.Common;
+using Quest.Auth.Api.Helpers.Auth;
 using Quest.Auth.Common.Settings;
 using Quest.Auth.Services;
 using Quest.Auth.Services.Interfaces;
@@ -76,20 +74,7 @@ namespace Quest.Auth.Api
             });
 
             #region Authentication and Authorization
-            var domain = auth0Setting.Domain;
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
-            {
-                options.Authority = domain;
-                options.Audience = auth0Setting.QuestAuth.Audience;
-
-            });
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy(AuthorizationScope.Products.Get, policy => policy.Requirements.Add(new AuthorizationScopeRequirement(AuthorizationScope.Products.Get, domain)));
-            });
-            // Register the scope authorization handler
-            services.AddSingleton<IAuthorizationHandler, AuthorizationScopeHandler>();
+            ConfigureAuthorization.Init(services, auth0Setting.Domain, auth0Setting.QuestAuth.Audience);
             #endregion
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -97,7 +82,7 @@ namespace Quest.Auth.Api
             services.AddScoped<IAuthenticationService, AuthenticationService>();
 
         }
-
+       
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {

@@ -4,7 +4,6 @@ using Quest.Auth.Common.Request;
 using Quest.Auth.Common.Response;
 using Quest.Auth.Common.Settings;
 using Quest.Auth.Services.Interfaces;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Quest.Auth.Services

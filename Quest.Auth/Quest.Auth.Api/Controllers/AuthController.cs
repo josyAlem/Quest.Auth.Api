@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Quest.Auth.Common;
+using Quest.Auth.Api.Helpers.Auth;
 using Quest.Auth.Common.Request;
 using Quest.Auth.Common.Response;
 using Quest.Auth.Services.Interfaces;
