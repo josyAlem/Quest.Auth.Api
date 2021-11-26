@@ -5,18 +5,29 @@ using System.Reflection;
 using System;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Quest.Auth.Services.Interfaces;
+using Quest.Auth.Services;
+using Quest.Auth.Common.Settings;
+using Microsoft.Extensions.Configuration;
 
 namespace Quest.Auth.Api.Helpers.Auth
 {
     public static class ConfigureAuthorization
     {
-        public static void Init(IServiceCollection services, string domain, string audience)
+        public static void Init(IServiceCollection services,IConfiguration auth0Config, List<Type> scopeTypes )
         {
+            var auth0Setting = new Auth0Settings();
+            auth0Config.Bind(auth0Setting);
+            services.Configure<Auth0Settings>(auth0Config);
+
+            string domain = auth0Setting.Domain;
+            string audience = auth0Setting.AuthAPI.Audience;
             AddAuthentication(services, domain, audience);
-            AddAuthorization(services, domain);
+            AddAuthorization(services,scopeTypes, domain);
 
             // Register the scope authorization handler
             services.AddSingleton<IAuthorizationHandler, AuthScopeHandler>();
+            services.AddScoped<IAuth0Service, Auth0Service>();
         }
         private static void AddAuthentication(IServiceCollection services, string domain, string audience)
         {
@@ -28,12 +39,9 @@ namespace Quest.Auth.Api.Helpers.Auth
 
                     });
         }
-        private static void AddAuthorization(IServiceCollection services, string domain)
+        private static void AddAuthorization(IServiceCollection services, List<Type> scopeTypes,string domain)
         {
-            //get auth scope list
-            List<Type> scopeTypes = typeof(AuthorizationScope).Assembly.GetTypes()
-                .Where(t => t.IsClass && t.IsSealed && t.IsAbstract && t.DeclaringType != null
-                  && t.DeclaringType.Name == nameof(AuthorizationScope)).ToList();
+           
 
             services.AddAuthorization(options =>
             {

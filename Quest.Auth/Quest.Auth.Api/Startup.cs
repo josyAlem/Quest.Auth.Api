@@ -10,6 +10,8 @@ using Quest.Auth.Services;
 using Quest.Auth.Services.Interfaces;
 using Serilog;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Quest.Auth.Api
 {
@@ -60,13 +62,6 @@ namespace Quest.Auth.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            #region Setting Config
-            var auth0Setting = new Auth0Settings();
-            var auth0Config = Configuration.GetSection("Auth0");
-            auth0Config.Bind(auth0Setting);
-            services.Configure<Auth0Settings>(auth0Config);
-            #endregion
-
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -74,11 +69,16 @@ namespace Quest.Auth.Api
             });
 
             #region Authentication and Authorization
-            ConfigureAuthorization.Init(services, auth0Setting.Domain, auth0Setting.QuestAuth.Audience);
+            //get auth scope list
+            List<Type> scopeTypes = typeof(AuthorizationScope).Assembly.GetTypes()
+                .Where(t => t.IsClass && t.IsSealed && t.IsAbstract && t.DeclaringType != null
+                  && t.DeclaringType.Name == nameof(AuthorizationScope)).ToList(); 
+            var auth0Config = Configuration.GetSection("Auth0");
+            
+            ConfigureAuthorization.Init(services, auth0Config, scopeTypes);
             #endregion
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-            services.AddScoped<IAuth0Service, Auth0Service>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
 
         }

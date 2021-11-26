@@ -64,7 +64,7 @@ namespace Quest.Auth.Common.Settings
         public Permissions Permissions { get; set; }
     }
 
-    public class QuestAuth
+    public class AuthAPI
     {
         [JsonPropertyName("ClientId")]
         public string ClientId { get; set; }
@@ -104,8 +104,8 @@ namespace Quest.Auth.Common.Settings
         [JsonPropertyName("ManagementAPI")]
         public ManagementAPI ManagementAPI { get; set; }
 
-        [JsonPropertyName("Quest.Auth")]
-        public QuestAuth QuestAuth { get; set; }
+        [JsonPropertyName("AuthAPI")]
+        public AuthAPI AuthAPI { get; set; }
 
         [JsonPropertyName("ClientSPA")]
         public ClientSPA ClientSPA { get; set; }

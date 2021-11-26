@@ -29,6 +29,11 @@ namespace Quest.Auth.Services
         }
         public async Task<Auth0LoginResponse> Login(Auth0LoginRequest loginRequest)
         {
+            loginRequest.Audience = _auth0Settings.AuthAPI.Audience;
+            loginRequest.GrantType = _auth0Settings.GrantTypes.PasswordRealm;
+            loginRequest.Realm = _auth0Settings.AuthAPI.ConnectionRealm;
+            loginRequest.Scope = _auth0Settings.AuthAPI.Scope;
+            
             var req = new RestRequest(_auth0Settings.Paths.Token, Method.POST);
             req.AddParameter("client_id", loginRequest.ClientId, ParameterType.GetOrPost);
             req.AddParameter("grant_type", loginRequest.GrantType, ParameterType.GetOrPost);
@@ -48,7 +53,7 @@ namespace Quest.Auth.Services
 
             var loginResponse = JsonConvert.DeserializeObject<Auth0LoginResponse>(response.Content);
 
-            var auth0UserinfoResponse = await GetUserInfo(new Auth0UserInfoRequest { AccessToken = loginResponse.AccessToken, Audience = _auth0Settings.QuestAuth.Audience });
+            var auth0UserinfoResponse = await GetUserInfo(new Auth0UserInfoRequest { AccessToken = loginResponse.AccessToken, Audience = _auth0Settings.AuthAPI.Audience });
             UserInfoResponse userinfoResponse = _mapper.Map<UserInfoResponse>(auth0UserinfoResponse);
 
             loginResponse.IsAdmin = userinfoResponse.Roles.Any(c=>c.ToLower() == AdminRole.ToLower()) ? true : false;
@@ -60,6 +65,7 @@ namespace Quest.Auth.Services
 
         public async Task<Auth0RefreshTokenResponse> Refresh(Auth0RefreshTokenRequest refreshTokenRequest)
         {
+            refreshTokenRequest.GrantType = _auth0Settings.GrantTypes.Refresh;
             var req = new RestRequest(_auth0Settings.Paths.Token, Method.POST);
             req.AddParameter("client_id", refreshTokenRequest.ClientId, ParameterType.GetOrPost);
             req.AddParameter("grant_type", refreshTokenRequest.GrantType, ParameterType.GetOrPost);
@@ -79,8 +85,9 @@ namespace Quest.Auth.Services
 
         public async Task<Auth0SignupResponse> SignUp(Auth0SignupRequest signupRequest)
         {
+            signupRequest.Connection = _auth0Settings.AuthAPI.ConnectionRealm;
             var getTokenResponse = await GetManagementAPIToken(_auth0Settings.Domain + _auth0Settings.ManagementAPI.Token.Path,
-                _auth0Settings.QuestAuth.ClientId, _auth0Settings.QuestAuth.ClientSecret, _auth0Settings.GrantTypes.Client);
+                _auth0Settings.AuthAPI.ClientId, _auth0Settings.AuthAPI.ClientSecret, _auth0Settings.GrantTypes.Client);
 
             var req = new RestRequest(_auth0Settings.ManagementAPI.Token.Path 
                 + _auth0Settings.ManagementAPI.Users.Path, Method.POST);
@@ -115,7 +122,7 @@ namespace Quest.Auth.Services
         private async Task<List<Auth0RoleResponse>> GetUserRoles(string userId)
         {
             var getTokenResponse = await GetManagementAPIToken(_auth0Settings.Domain + _auth0Settings.ManagementAPI.Token.Path,
-                _auth0Settings.QuestAuth.ClientId, _auth0Settings.QuestAuth.ClientSecret, _auth0Settings.GrantTypes.Client);
+                _auth0Settings.AuthAPI.ClientId, _auth0Settings.AuthAPI.ClientSecret, _auth0Settings.GrantTypes.Client);
 
             var req = new RestRequest(_auth0Settings.ManagementAPI.Token.Path 
                 + _auth0Settings.ManagementAPI.Users.Path + "/" + userId + "/" + _auth0Settings.ManagementAPI.Roles.Path, Method.GET);
@@ -136,7 +143,7 @@ namespace Quest.Auth.Services
         private async Task<List<Auth0PermissionResponse>> GetUserPermissions(string userId)
         {
             var getTokenResponse = await GetManagementAPIToken(_auth0Settings.Domain + _auth0Settings.ManagementAPI.Token.Path,
-              _auth0Settings.QuestAuth.ClientId, _auth0Settings.QuestAuth.ClientSecret, _auth0Settings.GrantTypes.Client);
+              _auth0Settings.AuthAPI.ClientId, _auth0Settings.AuthAPI.ClientSecret, _auth0Settings.GrantTypes.Client);
 
             var req = new RestRequest(_auth0Settings.ManagementAPI.Token.Path 
                 + _auth0Settings.ManagementAPI.Users.Path + "/" + userId + "/" 
