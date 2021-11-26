@@ -7,6 +7,13 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="10.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Studio.Auth.Auth0" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Studio.Auth.Auth0">
+      <HintPath>..\..\..\..\Studio\Studio.Nuget\Studio.Auth.Auth0\bin\Debug\net5.0\Studio.Auth.Auth0.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

@@ -4,14 +4,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using Quest.Auth.Api.Helpers.Auth;
-using Quest.Auth.Common.Settings;
 using Quest.Auth.Services;
 using Quest.Auth.Services.Interfaces;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Studio.Auth.Auth0.Config;
+using Quest.Auth.Api.Helpers.Auth;
 
 namespace Quest.Auth.Api
 {
@@ -73,9 +73,10 @@ namespace Quest.Auth.Api
             List<Type> scopeTypes = typeof(AuthorizationScope).Assembly.GetTypes()
                 .Where(t => t.IsClass && t.IsSealed && t.IsAbstract && t.DeclaringType != null
                   && t.DeclaringType.Name == nameof(AuthorizationScope)).ToList(); 
-            var auth0Config = Configuration.GetSection("Auth0");
+           
+            IConfiguration auth0Config = Configuration.GetSection("Auth0");
             
-            ConfigureAuthorization.Init(services, auth0Config, scopeTypes);
+            Auth0Middleware.Init(services, auth0Config, scopeTypes);
             #endregion
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

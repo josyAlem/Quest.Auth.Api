@@ -11,10 +11,17 @@
     <PackageReference Include="Serilog" Version="2.10.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="4.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="Studio.Auth.Auth0" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Quest.Auth.Common\Quest.Auth.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Studio.Auth.Auth0">
+      <HintPath>..\..\..\..\Studio\Studio.Nuget\Studio.Auth.Auth0\bin\Debug\net5.0\Studio.Auth.Auth0.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
-using Microsoft.Extensions.Options;
 using Quest.Auth.Common.Request;
 using Quest.Auth.Common.Response;
-using Quest.Auth.Common.Settings;
 using Quest.Auth.Services.Interfaces;
+using Studio.Auth.Auth0.Interfaces;
+using Studio.Auth.Auth0.Models;
 using System.Threading.Tasks;
 
 namespace Quest.Auth.Services
