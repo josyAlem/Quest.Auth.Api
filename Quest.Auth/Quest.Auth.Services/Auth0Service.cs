@@ -20,7 +20,6 @@ namespace Quest.Auth.Services
         private RestClient _client;
         private readonly Auth0Settings _auth0Settings;
         private readonly IMapper _mapper;
-        private const string AdminRole = "ADMIN";
         public Auth0Service(IOptions<Auth0Settings> auth0Config,IMapper mapper)
         {
             _auth0Settings = auth0Config.Value;
@@ -56,7 +55,7 @@ namespace Quest.Auth.Services
             var auth0UserinfoResponse = await GetUserInfo(new Auth0UserInfoRequest { AccessToken = loginResponse.AccessToken, Audience = _auth0Settings.AuthAPI.Audience });
             UserInfoResponse userinfoResponse = _mapper.Map<UserInfoResponse>(auth0UserinfoResponse);
 
-            loginResponse.IsAdmin = userinfoResponse.Roles.Any(c=>c.ToLower() == AdminRole.ToLower()) ? true : false;
+            loginResponse.IsAdmin = userinfoResponse.Roles.Any(c=>c.ToLower() == _auth0Settings.AuthAPI.AdminRole.ToLower());
             loginResponse.Permissions = userinfoResponse.Permissions;
             loginResponse.Roles = userinfoResponse.Roles;
 

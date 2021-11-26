@@ -79,6 +79,8 @@ namespace Quest.Auth.Common.Settings
         public string ConnectionRealm { get; set; }
         [JsonPropertyName("Scope")]
         public string Scope { get; set; }
+        [JsonPropertyName("AdminRole")]
+        public string AdminRole { get; set; }
     }
 
     public class ClientSPA
