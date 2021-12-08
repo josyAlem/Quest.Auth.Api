@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 using Quest.Auth.Api.Helpers.Auth;
 using Quest.Auth.Common.Request;
 using Quest.Auth.Common.Response;
 using Quest.Auth.Services.Interfaces;
+using System;
 using System.Threading.Tasks;
 
 
@@ -15,10 +18,11 @@ namespace Quest.Auth.Api.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthenticationService _authenticationService;
-
-        public AuthController(IAuthenticationService authenticationService)
+        private readonly string _connString="";
+        public AuthController(IAuthenticationService authenticationService,IConfiguration config)
         {
             _authenticationService = authenticationService;
+            _connString = config.GetConnectionString("Default");
         }
        
         [HttpPost("[action]")]
@@ -51,6 +55,23 @@ namespace Quest.Auth.Api.Controllers
         public IActionResult Validate()
         {
             return Ok();//return user
+        }
+        [HttpGet("[action]")]
+        [AllowAnonymous]
+        public async Task<IActionResult> CheckDb()
+        {
+            try
+            {
+                await using var connection = new SqlConnection(_connString);
+
+                var db = connection.Database;
+
+
+                return Ok(db);
+            }
+            catch (Exception ex) {
+                return StatusCode(500, ex);
+            }
         }
     }
 }
