@@ -74,7 +74,7 @@ namespace Quest.Auth.Api.Controllers
         private  string ReadOrderData(string connectionString)
         {
             string queryString =
-                "SELECT Id,Name FROM dbo.TestTable;";
+                "SELECT Id,Name FROM dbo.TestTable order by Id;";
             string result = "";
             using (SqlConnection connection = new SqlConnection(
                        connectionString))
