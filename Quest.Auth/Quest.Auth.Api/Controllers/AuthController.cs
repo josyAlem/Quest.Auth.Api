@@ -62,16 +62,36 @@ namespace Quest.Auth.Api.Controllers
         {
             try
             {
-                await using var connection = new SqlConnection(_connString);
-
-                var db = connection.Database;
+               string result= ReadOrderData(_connString);
 
 
-                return Ok(db);
+                return Ok(result);
             }
             catch (Exception ex) {
-                return StatusCode(500, ex);
+                return StatusCode(500, ex.Message);
             }
+        }
+        private  string ReadOrderData(string connectionString)
+        {
+            string queryString =
+                "SELECT Id,Name FROM dbo.TestTable;";
+            string result = "";
+            using (SqlConnection connection = new SqlConnection(
+                       connectionString))
+            {
+                SqlCommand command = new SqlCommand(
+                    queryString, connection);
+                connection.Open();
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        result+=(String.Format("{0}, {1}",
+                            reader[0], reader[1]));
+                    }
+                }
+            }
+            return result;
         }
     }
 }
